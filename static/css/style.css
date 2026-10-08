@@ -237,7 +237,7 @@ a.animated-link:hover, .nav-item-link:hover {
 
 /* View Sections */
 .view-section {
-  display: none;
+  display: block;
 }
 .view-section.active-view {
   display: block;

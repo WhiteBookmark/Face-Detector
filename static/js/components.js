@@ -54,16 +54,7 @@ class CustomHeader extends HTMLElement {
             letter-spacing: 0.05em;
             text-transform: uppercase;
           }
-          .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-          }
-          @media (max-width: 820px) {
-            .header-nav {
-              display: none;
-            }
-          }
+
           .header-badge {
             display: inline-flex;
             align-items: center;
@@ -97,15 +88,6 @@ class CustomHeader extends HTMLElement {
             </div>
           </a>
 
-          <nav class="header-nav">
-            <a href="#studio" class="nav-item-link" data-tab="studio">Verification Studio</a>
-            <a href="#architecture" class="nav-item-link" data-tab="architecture">CPU Architecture</a>
-            <a href="#about" class="nav-item-link" data-tab="about">About Us</a>
-            <a href="#contact" class="nav-item-link" data-tab="contact">Contact Us</a>
-            <a href="#privacy" class="nav-item-link" data-tab="privacy">Privacy</a>
-            <a href="#terms" class="nav-item-link" data-tab="terms">Terms</a>
-          </nav>
-
           <div class="header-badge" id="header-api-badge" title="Click to configure Backend API endpoint" style="cursor: pointer;">
             <div class="pulse-dot" id="header-pulse-dot"></div>
             <span id="header-backend-label">Backend: Detecting...</span>
@@ -113,17 +95,6 @@ class CustomHeader extends HTMLElement {
         </div>
       </header>
     `;
-
-    // Hook navigation link clicks
-    this.querySelectorAll('.header-nav a').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tab = link.getAttribute('data-tab');
-        if (window.switchAppTab) {
-          window.switchAppTab(tab);
-        }
-      });
-    });
   }
 }
 
@@ -143,16 +114,11 @@ class CustomFooter extends HTMLElement {
             max-width: 1280px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            grid-template-columns: 1.5fr 1fr;
             gap: 40px;
             margin-bottom: 36px;
           }
-          @media (max-width: 900px) {
-            .footer-inner {
-              grid-template-columns: 1fr 1fr;
-            }
-          }
-          @media (max-width: 580px) {
+          @media (max-width: 768px) {
             .footer-inner {
               grid-template-columns: 1fr;
             }
@@ -239,24 +205,7 @@ class CustomFooter extends HTMLElement {
             </div>
           </div>
 
-          <div>
-            <div class="footer-col-title">Navigation</div>
-            <ul class="footer-links-list">
-              <li><a href="#studio" class="animated-link" onclick="window.switchAppTab('studio'); return false;">Studio</a></li>
-              <li><a href="#architecture" class="animated-link" onclick="window.switchAppTab('architecture'); return false;">CPU Benchmarks</a></li>
-              <li><a href="#about" class="animated-link" onclick="window.switchAppTab('about'); return false;">About Project</a></li>
-              <li><a href="#contact" class="animated-link" onclick="window.switchAppTab('contact'); return false;">Contact Us</a></li>
-            </ul>
-          </div>
 
-          <div>
-            <div class="footer-col-title">Legal & Privacy</div>
-            <ul class="footer-links-list">
-              <li><a href="#privacy" class="animated-link" onclick="window.switchAppTab('privacy'); return false;">Privacy Policy</a></li>
-              <li><a href="#terms" class="animated-link" onclick="window.switchAppTab('terms'); return false;">Terms of Service</a></li>
-              <li><a href="#architecture" class="animated-link" onclick="window.switchAppTab('architecture'); return false;">Licensing Matrix</a></li>
-            </ul>
-          </div>
 
           <div>
             <div class="footer-col-title">Compliance Guarantee</div>
