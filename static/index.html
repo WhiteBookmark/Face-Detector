@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biometric Face Verification | CPU-Optimized 1:1 Identity Matching</title>
+  <meta name="description" content="Independent open-source 1:1 facial verification microservice running on CPU with MediaPipe BlazeFace and FaceNet Inception-ResNet-v1. Zero GPU rental overhead for brokerage KYC compliance.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='hsl(215,90%25,15%25)'/%3E%3Cpath d='M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z' fill='hsl(215,90%25,65%25)'/%3E%3C/svg%3E">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Shared Web Component Header -->
+  <custom-header></custom-header>
+
+  <!-- Main Application Body -->
+  <main class="app-container">
+
+    <!-- Top Navigation Tabs Switcher -->
+    <div class="view-tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-tab="studio" role="tab" id="tab-studio">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"/></svg>
+        </span>
+        <span>Verification Studio</span>
+      </button>
+
+      <button type="button" class="tab-btn" data-tab="architecture" role="tab" id="tab-architecture">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58v.23z"/></svg>
+        </span>
+        <span>CPU Architecture &amp; Benchmarks</span>
+      </button>
+
+      <button type="button" class="tab-btn" data-tab="about" role="tab" id="tab-about">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </span>
+        <span>About Project</span>
+      </button>
+
+      <button type="button" class="tab-btn" data-tab="contact" role="tab" id="tab-contact">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </span>
+        <span>Contact Us</span>
+      </button>
+
+      <button type="button" class="tab-btn" data-tab="privacy" role="tab" id="tab-privacy">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </span>
+        <span>Privacy Policy</span>
+      </button>
+
+      <button type="button" class="tab-btn" data-tab="terms" role="tab" id="tab-terms">
+        <span class="icon-bubble bubble-xs">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </span>
+        <span>Terms Of Service</span>
+      </button>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 1: VERIFICATION STUDIO                             -->
+    <!-- ======================================================= -->
+    <section id="view-studio" class="view-section active-view">
+      <div class="hero-header">
+        <h1>CPU 1:1 Facial Verification Studio</h1>
+        <p class="hero-subtitle">
+          Test open-source models directly on standard CPU hardware. Compare an ID photo with a live selfie to benchmark accuracy, latency, and cosine similarity with zero external API fees.
+        </p>
+      </div>
+
+      <!-- Quick 1-Click Sample Test Strip -->
+      <div class="sample-bar">
+        <div class="sample-bar-label">
+          <span class="icon-bubble bubble-xs">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          </span>
+          <span>Instant Test Samples:</span>
+        </div>
+        <div class="sample-chips-group" id="sample-chips-container">
+          <button type="button" class="sample-chip-btn" id="sample-btn-loading">
+            <span>Loading Sample Pairs...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Pair Studio Grid -->
+      <div class="studio-grid">
+        <!-- Image 1 Dropzone -->
+        <div class="glass-card upload-card" id="card-image-1">
+          <div class="upload-card-header">
+            <h3 class="card-title">Image 1: Reference Face</h3>
+            <span class="badge">Government ID / Portrait</span>
+          </div>
+
+          <div class="dropzone" id="dropzone-1">
+            <input type="file" id="file-input-1" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            
+            <div class="dropzone-empty" id="empty-prompt-1">
+              <div class="icon-bubble bubble-lg">
+                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              </div>
+              <div class="dropzone-prompt">Drag &amp; Drop Reference Image</div>
+              <div class="dropzone-hint">Or click to browse from device (JPG, PNG)</div>
+            </div>
+
+            <div class="preview-wrapper" id="preview-wrap-1">
+              <img id="preview-img-1" alt="Face 1 Preview">
+              <button type="button" class="preview-change-btn">Change Photo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image 2 Dropzone -->
+        <div class="glass-card upload-card" id="card-image-2">
+          <div class="upload-card-header">
+            <h3 class="card-title">Image 2: Verification Face</h3>
+            <span class="badge">Live Selfie / Query Photo</span>
+          </div>
+
+          <div class="dropzone" id="dropzone-2">
+            <input type="file" id="file-input-2" accept="image/jpeg,image/png,image/webp" style="display: none;">
+
+            <div class="dropzone-empty" id="empty-prompt-2">
+              <div class="icon-bubble bubble-lg">
+                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              </div>
+              <div class="dropzone-prompt">Drag &amp; Drop Verification Image</div>
+              <div class="dropzone-hint">Or click to browse from device (JPG, PNG)</div>
+            </div>
+
+            <div class="preview-wrapper" id="preview-wrap-2">
+              <img id="preview-img-2" alt="Face 2 Preview">
+              <button type="button" class="preview-change-btn">Change Photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Selection Strip -->
+      <div class="glass-card config-strip">
+        <!-- Detector Selector with Interior Left Icon -->
+        <div class="input-group">
+          <label for="detector-select" class="form-label">Face Detector &amp; Aligner</label>
+          <div class="input-wrapper">
+            <div class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/></svg>
+            </div>
+            <select id="detector-select" class="custom-select" autofocus>
+              <option value="blazeface" selected>MediaPipe BlazeFace (Google, ~8 ms)</option>
+              <option value="yunet">OpenCV YuNet (libfacedetection, ~12 ms)</option>
+              <option value="haar">OpenCV Haar Cascade (~35 ms)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Recognizer Selector with Interior Left Icon -->
+        <div class="input-group">
+          <label for="recognizer-select" class="form-label">Feature Extractor (Embedding Model)</label>
+          <div class="input-wrapper">
+            <div class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            </div>
+            <select id="recognizer-select" class="custom-select">
+              <option value="facenet" selected>FaceNet (Inception-ResNet-v1, 512-d)</option>
+              <option value="sface">OpenCV SFace (128-d, OpenCV DNN)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Match Threshold Settings -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <span class="form-label">Match Sensitivity Threshold</span>
+            <span class="slider-val-badge" id="threshold-val">0.600 (FaceNet Standard)</span>
+          </div>
+          <input type="range" id="threshold-slider" min="0.10" max="0.90" step="0.01" value="0.60">
+          <div style="display: flex; gap: 6px; margin-top: 4px;">
+            <button type="button" class="preset-btn chip" data-preset="strict">Strict KYC (0.70)</button>
+            <button type="button" class="preset-btn chip" data-preset="balanced">Standard (0.60)</button>
+            <button type="button" class="preset-btn chip" data-preset="lenient">Lenient (0.50)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button with Spinner -->
+      <div class="action-area">
+        <button type="button" class="btn-verify" id="verify-btn" disabled>
+          <span class="verify-btn-icon icon-bubble bubble-xs" style="background: transparent; color: inherit;">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </span>
+          <svg class="spinner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+          </svg>
+          <span>Verify Faces On CPU</span>
+        </button>
+      </div>
+
+      <!-- Results Section -->
+      <div class="glass-card results-card" id="results-card">
+        <div class="results-header">
+          <div>
+            <div id="results-status-badge" class="status-badge-hero match">
+              <span>Awaiting Execution</span>
+            </div>
+            <p id="results-status-title" style="margin-top: 8px; color: var(--color-grey-8); font-weight: 500;">
+              Run verification to compute facial vector distance.
+            </p>
+          </div>
+          <div id="results-warnings" style="display: none;"></div>
+        </div>
+
+        <!-- Metrics Overview -->
+        <div class="metrics-row">
+          <div class="metric-box">
+            <span class="metric-label">Biometric Confidence</span>
+            <span class="metric-val" id="metric-confidence">0.0%</span>
+            <span class="metric-sub">Calibrated Probability</span>
+          </div>
+
+          <div class="metric-box">
+            <span class="metric-label">Cosine Similarity</span>
+            <span class="metric-val" id="metric-cosine">0.0000</span>
+            <span class="metric-sub">Range [-1.0, +1.0]</span>
+          </div>
+
+          <div class="metric-box">
+            <span class="metric-label">Euclidean L2 Distance</span>
+            <span class="metric-val" id="metric-euclidean">0.0000</span>
+            <span class="metric-sub">Vector Space Distance</span>
+          </div>
+
+          <div class="metric-box">
+            <span class="metric-label">Total CPU Execution Time</span>
+            <span class="metric-val" id="metric-latency">0 ms</span>
+            <span class="metric-sub">End-to-End Latency</span>
+          </div>
+        </div>
+
+        <!-- 4-Image Side-by-Side Visual Inspection -->
+        <h3 style="margin-bottom: 14px;">Facial Alignment &amp; Feature Crop Inspection</h3>
+        <div class="visual-grid">
+          <div class="visual-cell">
+            <div class="visual-cell-title">Image 1: Detection Box &amp; Keypoints</div>
+            <img id="res-annotated-1" alt="Face 1 Annotated">
+          </div>
+
+          <div class="visual-cell">
+            <div class="visual-cell-title">Crop 1: Aligned Feature Input</div>
+            <img id="res-crop-1" alt="Crop 1 Input">
+          </div>
+
+          <div class="visual-cell">
+            <div class="visual-cell-title">Crop 2: Aligned Feature Input</div>
+            <img id="res-crop-2" alt="Crop 2 Input">
+          </div>
+
+          <div class="visual-cell">
+            <div class="visual-cell-title">Image 2: Detection Box &amp; Keypoints</div>
+            <img id="res-annotated-2" alt="Face 2 Annotated">
+          </div>
+        </div>
+
+        <!-- Table-Responsive CPU Latency Breakdown -->
+        <h3 style="margin-bottom: 14px;">Pipeline CPU Performance Breakdown</h3>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="table-header">Pipeline Stage</th>
+                <th class="table-header">Operation Description</th>
+                <th class="table-header">Execution Time</th>
+                <th class="table-header">Hardware Target</th>
+              </tr>
+            </thead>
+            <tbody id="latency-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 2: CPU ARCHITECTURE & BENCHMARKS                   -->
+    <!-- ======================================================= -->
+    <section id="view-architecture" class="view-section">
+      <div class="content-section">
+        <div class="content-block">
+          <h2>Deployment Options &amp; Cost Analysis for Leadership</h2>
+          <p>
+            When presenting to your forex broker CEO, the crucial fact is: <strong>1:1 facial verification does NOT require an expensive GPU.</strong>
+          </p>
+          <p>
+            Unlike Large Language Models (LLMs) that require 24GB–80GB of VRAM, facial embedding models like FaceNet (90MB) or SFace (37MB) are compact convolutional networks. A modern 4-core cloud VPS running optimized ONNX Runtime or LiteRT processes facial pairs in <strong>under 120 milliseconds</strong> per check.
+          </p>
+
+          <div class="table-responsive" style="margin-top: 20px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="table-header">Deployment Tier</th>
+                  <th class="table-header">Upfront Cost</th>
+                  <th class="table-header">Monthly Cost</th>
+                  <th class="table-header">Latency / Pair</th>
+                  <th class="table-header">Best Operational Fit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background-color: hsla(145, 80%, 25%, 0.15);">
+                  <td><strong>1. Standard CPU Cloud VPS (Recommended)</strong></td>
+                  <td>$0</td>
+                  <td>$15 &ndash; $40 / mo</td>
+                  <td>~100 &ndash; 150 ms</td>
+                  <td><strong>95% of Brokerage KYC Volumes (&lt;5,000 checks/day)</strong></td>
+                </tr>
+                <tr>
+                  <td>2. Serverless Cloud GPU (Pay-Per-Second)</td>
+                  <td>$0</td>
+                  <td>$2 &ndash; $10 / mo</td>
+                  <td>~30 ms (warm) / 5&ndash;10s (cold)</td>
+                  <td>Bursty, low-volume checks where 8s cold start is acceptable</td>
+                </tr>
+                <tr>
+                  <td>3. Dedicated Cloud GPU (A4000 / T4)</td>
+                  <td>$0</td>
+                  <td>$150 &ndash; $380 / mo</td>
+                  <td>~20 &ndash; 40 ms</td>
+                  <td>Massive scale (&gt;100 requests per second continuous load)</td>
+                </tr>
+                <tr>
+                  <td>4. On-Premises Office Workstation</td>
+                  <td>$1,000 &ndash; $1,500</td>
+                  <td>$15 &ndash; $30 / mo</td>
+                  <td>~20 &ndash; 50 ms</td>
+                  <td>Strict offline air-gapped intranet compliance</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2>Model Licensing Matrix &amp; Commercial Compliance</h2>
+          <p>
+            Many teams make the critical legal mistake of using InsightFace (e.g. <code>buffalo_l</code> or <code>antelopev2</code> weights) in commercial brokerage systems without realizing that InsightFace pretrained weights are restricted to non-commercial research only.
+          </p>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="table-header">Model Name</th>
+                  <th class="table-header">Role</th>
+                  <th class="table-header">Model Size</th>
+                  <th class="table-header">License</th>
+                  <th class="table-header">Commercial Safe?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>MediaPipe BlazeFace</strong></td>
+                  <td>Face Detector</td>
+                  <td>230 KB</td>
+                  <td>Apache 2.0</td>
+                  <td><span class="badge badge-match">Yes (Commercial)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>FaceNet (Inception-ResNet-v1)</strong></td>
+                  <td>512-d Recognizer</td>
+                  <td>90 MB</td>
+                  <td>MIT</td>
+                  <td><span class="badge badge-match">Yes (Commercial)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>OpenCV YuNet</strong></td>
+                  <td>Face Detector</td>
+                  <td>232 KB</td>
+                  <td>MIT</td>
+                  <td><span class="badge badge-match">Yes (Commercial)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>OpenCV SFace</strong></td>
+                  <td>128-d Recognizer</td>
+                  <td>37 MB</td>
+                  <td>Apache 2.0</td>
+                  <td><span class="badge badge-match">Yes (Commercial)</span></td>
+                </tr>
+                <tr>
+                  <td>InsightFace (buffalo_l)</td>
+                  <td>Embedder</td>
+                  <td>300 MB</td>
+                  <td>Non-Commercial Research</td>
+                  <td><span class="badge badge-mismatch">Requires Paid License</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 3: ABOUT US (TRANSFORMATION NARRATIVE)             -->
+    <!-- ======================================================= -->
+    <section id="view-about" class="view-section">
+      <div class="content-section">
+        <div class="content-block">
+          <h2>Our Story: Breaking Free From Big-Tech KYC Dependence</h2>
+          <p>
+            Every growing brokerage reaches a pivotal crossroads. When our client volume scaled past thousands of international traders, our compliance costs skyrocketed. Major cloud vendors were charging tens of thousands of dollars each month for proprietary face matching APIs—while forcing sensitive client passport photos onto third-party infrastructure.
+          </p>
+          <p>
+            Our leadership asked a simple question: <em>"Can we take complete sovereign ownership of our biometric verification, protect client privacy, and eliminate recurring vendor lock-in without investing in massive GPU server farms?"</em>
+          </p>
+          <p>
+            The breakthrough came from mathematical efficiency: by coupling Google's MediaPipe BlazeFace with an optimized Inception-ResNet-v1 ONNX runtime engine, we demonstrated that modern cloud CPUs can extract 512-dimensional feature vectors in under 120 milliseconds. Zero GPUs. Zero third-party API dependencies. 100% open-source commercial licensing.
+          </p>
+          <p>
+            Today, our biometric verification microservice gives brokerages complete data custody, sub-second onboarding, and compliance certainty at a fraction of standard enterprise costs.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 4: CONTACT US                                      -->
+    <!-- ======================================================= -->
+    <section id="view-contact" class="view-section">
+      <div class="content-section">
+        <div class="content-block">
+          <h2>Contact Our Biometric Verification Team</h2>
+          <p>
+            Have technical questions about deploying this microservice inside your broker infrastructure, Docker setup, or security audits? Reach out to our engineering office.
+          </p>
+
+          <div class="contact-grid">
+            <!-- Phone -->
+            <div class="contact-card">
+              <div class="icon-bubble bubble-md">
+                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+              </div>
+              <div>
+                <div class="contact-info-title">Telephone</div>
+                <a href="tel:+18005550199" class="contact-link">+1 (800) 555-0199</a>
+                <p style="font-size: 0.8rem; margin-top: 4px;">Direct Compliance Line</p>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="contact-card">
+              <div class="icon-bubble bubble-md">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div>
+                <div class="contact-info-title">Email</div>
+                <a href="mailto:compliance@brokeragefaceverify.internal" class="contact-link">compliance@brokeragefaceverify.internal</a>
+                <p style="font-size: 0.8rem; margin-top: 4px;">Engineering &amp; Security</p>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="contact-card">
+              <div class="icon-bubble bubble-md">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <div>
+                <div class="contact-info-title">Headquarters</div>
+                <a href="https://maps.google.com/?q=Wall+Street+Financial+District+New+York" target="_blank" rel="noopener noreferrer" class="contact-link">
+                  Financial Center, Wall Street, NY
+                </a>
+                <p style="font-size: 0.8rem; margin-top: 4px;">Open in Google Maps</p>
+              </div>
+            </div>
+
+            <!-- Working Hours -->
+            <div class="contact-card">
+              <div class="icon-bubble bubble-md">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              </div>
+              <div>
+                <div class="contact-info-title">Operating Hours</div>
+                <span style="color: var(--color-grey-8); font-size: 0.9rem;">Monday &ndash; Friday</span>
+                <p style="font-size: 0.8rem; margin-top: 4px;">08:00 &ndash; 18:00 EST (24/7 API Monitoring)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 5: PRIVACY POLICY                                  -->
+    <!-- ======================================================= -->
+    <section id="view-privacy" class="view-section">
+      <div class="content-section">
+        <div class="content-block">
+          <h2>Biometric Data Privacy Policy</h2>
+          <p>
+            Your privacy and regulatory compliance are our highest priority. This service is architected for strict zero-retention biometric compliance under GDPR, CCPA, and BIPA standards.
+          </p>
+          <ul>
+            <li><strong>Zero Persistent Storage:</strong> Submitted facial images are parsed solely in volatile memory (RAM) for the duration of vector extraction. Images are never written to disk or database.</li>
+            <li><strong>No Third-Party Transmission:</strong> All models run entirely on your local machine or private VPS. No data leaves your secure perimeter.</li>
+            <li><strong>Vector Ephemerality:</strong> The 512-dimensional vector is used strictly to calculate cosine similarity and is wiped immediately after returning the match payload.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 6: TERMS OF SERVICE                                -->
+    <!-- ======================================================= -->
+    <section id="view-terms" class="view-section">
+      <div class="content-section">
+        <div class="content-block">
+          <h2>Terms of Service &amp; Model Licensing</h2>
+          <p>
+            This software is provided under permissible open-source terms for institutional brokerage KYC and identity verification.
+          </p>
+          <ul>
+            <li><strong>Model Attribution:</strong> MediaPipe BlazeFace is developed by Google under Apache 2.0. FaceNet is implemented under MIT. OpenCV YuNet and SFace are provided under MIT and Apache 2.0.</li>
+            <li><strong>Verification Authority:</strong> The calculated similarity score is an algorithmic confidence metric. Financial institutions must maintain human compliance review for threshold border cases.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared Web Component Footer -->
+  <custom-footer></custom-footer>
+
+  <!-- Sticky Bottom-Right Rectangular Navigation Box (Up/Down Instant Scroll) -->
+  <div class="sticky-nav-box" title="Quick Navigation">
+    <button type="button" class="sticky-nav-btn" id="sticky-scroll-up" aria-label="Scroll to top instantly">
+      <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+    </button>
+    <button type="button" class="sticky-nav-btn" id="sticky-scroll-down" aria-label="Scroll to bottom instantly">
+      <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+    </button>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
